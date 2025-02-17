@@ -1,3 +1,3 @@
-import start from "./core/Game";
+import game from "./core/Game";
 
-start();
+game.start();

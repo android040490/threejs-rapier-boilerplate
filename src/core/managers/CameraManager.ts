@@ -2,11 +2,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/Addons.js";
 import { WindowSizeManager } from "./WindowSizeManager";
 import { Game } from "../Game";
+import eventBus, { EventBus } from "../event/EventBus";
+import { WindowResized } from "../event/WindowResized";
 
 export class CameraManager {
   private readonly windowSizeManager: WindowSizeManager;
   private readonly canvas: HTMLCanvasElement;
   private readonly scene: THREE.Scene;
+  private readonly eventBus: EventBus;
   private _camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
 
@@ -14,9 +17,14 @@ export class CameraManager {
     this.windowSizeManager = game.windowSizeManager;
     this.canvas = game.canvas;
     this.scene = game.scene;
+    this.eventBus = eventBus;
 
     this.setCamera();
     this.setControls();
+
+    this.resize = this.resize.bind(this);
+
+    this.eventBus.on(WindowResized, this.resize);
   }
 
   resize(): void {
@@ -30,6 +38,7 @@ export class CameraManager {
   }
 
   dispose(): void {
+    this.eventBus.off(WindowResized, this.resize);
     this.controls.dispose();
   }
 

@@ -1,11 +1,7 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/examples/jsm/Addons.js";
-import eventBus, { EventBus } from "./EventBus";
-
-export enum ResourcesEvent {
-  Ready = "resources:ready",
-  LoadingProgress = "resources:loading-progress",
-}
+import eventBus, { EventBus } from "../event/EventBus";
+import { ResourcesLoading, ResourcesReady } from "../event/Resource";
 
 interface Loaders {
   texture: THREE.TextureLoader;
@@ -50,11 +46,11 @@ export class ResourcesManager {
 
   private listenLoadingEvents(): void {
     this.loadingManager.onLoad = () => {
-      this.eventBus.emit(ResourcesEvent.Ready);
+      this.eventBus.emit(new ResourcesReady());
     };
     this.loadingManager.onProgress = (_: string, loaded, total) => {
       const progress = loaded / total;
-      this.eventBus.emit(ResourcesEvent.LoadingProgress, progress);
+      this.eventBus.emit(new ResourcesLoading(progress));
     };
   }
 }

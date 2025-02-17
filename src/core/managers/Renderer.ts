@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { WindowSizeManager } from "./WindowSizeManager";
 import { CameraManager } from "./CameraManager";
 import { Game } from "../Game";
+import eventBus, { EventBus } from "../event/EventBus";
+import { WindowResized } from "../event/WindowResized";
 
 export default class Renderer {
   private readonly canvas: HTMLCanvasElement;
@@ -9,12 +11,14 @@ export default class Renderer {
   private readonly scene: THREE.Scene;
   private readonly cameraManager: CameraManager;
   private readonly instance: THREE.WebGLRenderer;
+  private readonly eventBus: EventBus;
 
   constructor(game: Game) {
     this.canvas = game.canvas;
     this.windowSizeManager = game.windowSizeManager;
     this.scene = game.scene;
     this.cameraManager = game.cameraManager;
+    this.eventBus = eventBus;
 
     this.instance = new THREE.WebGLRenderer({
       canvas: this.canvas,
@@ -22,6 +26,10 @@ export default class Renderer {
     });
 
     this.init();
+
+    this.resize = this.resize.bind(this);
+
+    this.eventBus.on(WindowResized, this.resize);
   }
 
   resize(): void {
@@ -37,6 +45,7 @@ export default class Renderer {
   }
 
   dispose(): void {
+    this.eventBus.off(WindowResized, this.resize);
     this.instance.dispose();
   }
 

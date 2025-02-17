@@ -1,8 +1,5 @@
-import eventBus, { EventBus } from "./EventBus";
-
-export enum SizesEvent {
-  Resize = "sizes:resize",
-}
+import eventBus, { EventBus } from "../event/EventBus";
+import { WindowResized } from "../event/WindowResized";
 
 export class WindowSizeManager {
   private _width!: number;
@@ -16,7 +13,7 @@ export class WindowSizeManager {
     window.addEventListener("resize", () => {
       this.setSizes();
 
-      this.eventBus.emit(SizesEvent.Resize);
+      this.eventBus.emit(new WindowResized());
     });
   }
 

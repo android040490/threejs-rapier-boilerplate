@@ -1,8 +1,5 @@
-import eventBus, { EventBus } from "./EventBus";
-
-export enum TimeEvent {
-  Tick = "time:tick",
-}
+import eventBus, { EventBus } from "../event/EventBus";
+import { TimeTick } from "../event/TimeTick";
 
 export class TimeManager {
   private start: number;
@@ -36,7 +33,7 @@ export class TimeManager {
     this.current = currentTime;
     this._elapsed = this.current - this.start;
 
-    this.eventBus.emit(TimeEvent.Tick);
+    this.eventBus.emit(new TimeTick());
 
     window.requestAnimationFrame(() => {
       this.tick();

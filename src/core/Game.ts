@@ -1,12 +1,14 @@
 import * as THREE from "three";
 import Stats from "stats.js";
-import { SizesEvent, WindowSizeManager } from "./managers/WindowSizeManager";
-import { TimeEvent, TimeManager } from "./managers/TimeManager";
+import { WindowSizeManager } from "./managers/WindowSizeManager";
+import { TimeManager } from "./managers/TimeManager";
 import { CameraManager } from "./managers/CameraManager";
 import Renderer from "./managers/Renderer";
 import { ResourcesManager } from "./managers/ResourcesManager";
 import { DebugManager } from "./managers/DebugManager";
-import eventBus, { EventBus } from "./managers/EventBus";
+import eventBus, { EventBus } from "./event/EventBus";
+import { SystemManager } from "./managers/SystemManager";
+import { TimeTick } from "./event/TimeTick";
 
 let instance: Game;
 
@@ -20,6 +22,7 @@ export class Game {
   public readonly renderer!: Renderer;
   public readonly scene!: THREE.Scene;
   private readonly eventBus!: EventBus;
+  private readonly systemManager!: SystemManager;
 
   private stats?: Stats;
 
@@ -42,17 +45,15 @@ export class Game {
     this.resourcesManager = new ResourcesManager();
     this.cameraManager = new CameraManager(this);
     this.renderer = new Renderer(this);
+    this.systemManager = new SystemManager();
     this.eventBus = eventBus;
 
-    // Sizes resize event
-    this.eventBus.on(SizesEvent.Resize, () => {
-      this.resize();
-    });
+    this.update = this.update.bind(this);
+  }
 
+  start(): void {
     // Time tick event
-    this.eventBus.on(TimeEvent.Tick, () => {
-      this.update();
-    });
+    this.eventBus.on(TimeTick, this.update);
 
     if (this.debugManager.active) {
       this.setDebug();
@@ -60,8 +61,7 @@ export class Game {
   }
 
   destroy(): void {
-    this.eventBus.off(SizesEvent.Resize);
-    this.eventBus.off(TimeEvent.Tick);
+    this.eventBus.off(TimeTick, this.update);
 
     this.scene.traverse((child) => {
       if (child instanceof THREE.Mesh) {
@@ -85,16 +85,12 @@ export class Game {
     }
   }
 
-  private resize(): void {
-    this.cameraManager.resize();
-    this.renderer.resize();
-  }
-
   private update(): void {
     if (this.debugManager.active) {
       this.stats?.begin();
     }
     this.cameraManager.update();
+    this.systemManager.update();
     this.renderer.update();
     if (this.debugManager.active) {
       this.stats?.end();
@@ -108,4 +104,4 @@ export class Game {
   }
 }
 
-export default () => new Game();
+export default new Game();
