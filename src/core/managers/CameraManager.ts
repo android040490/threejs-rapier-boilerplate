@@ -8,7 +8,6 @@ import { WindowResized } from "../event/WindowResized";
 export class CameraManager {
   private readonly windowSizeManager: WindowSizeManager;
   private readonly canvas: HTMLCanvasElement;
-  private readonly scene: THREE.Scene;
   private readonly eventBus: EventBus;
   private _camera!: THREE.PerspectiveCamera;
   private controls!: OrbitControls;
@@ -16,7 +15,6 @@ export class CameraManager {
   constructor(game: Game) {
     this.windowSizeManager = game.windowSizeManager;
     this.canvas = game.canvas;
-    this.scene = game.scene;
     this.eventBus = eventBus;
 
     this.setCamera();
@@ -56,7 +54,6 @@ export class CameraManager {
 
     this._camera.position.set(0, 3, 10);
     this._camera.lookAt(0, 0, 0);
-    this.scene.add(this._camera);
   }
 
   private setControls(): void {

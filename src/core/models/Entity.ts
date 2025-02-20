@@ -1,28 +1,24 @@
 import { v4 as uuidv4 } from "uuid";
 
-export type Constructor<T> = new (...args: any[]) => T;
+export type Constructor<T = object> = new (...args: any[]) => T;
 
 export class Entity {
-  private readonly components: object[] = [];
-
+  private readonly components = new Map<
+    Constructor["name"],
+    InstanceType<Constructor>
+  >();
   id: string;
 
   constructor() {
     this.id = uuidv4();
   }
 
-  public getComponent<T>(type: Constructor<T>): T | undefined {
-    for (const component of this.components) {
-      if (component instanceof type) {
-        return component;
-      }
-    }
-
-    // throw "No component available, use Entity#hasComponent to check existance first.";
+  public getComponent<T>(componentType: Constructor<T>): T | undefined {
+    return this.components.get(componentType.name) as T;
   }
 
   public addComponent(component: object): void {
-    this.components.push(component);
+    this.components.set(component.constructor.name, component);
   }
 
   public addComponents(...components: object[]): void {
@@ -31,23 +27,13 @@ export class Entity {
     }
   }
 
-  public hasComponent(type: Constructor<any>): boolean {
-    for (const component of this.components) {
-      if (component instanceof type) {
-        return true;
-      }
-    }
-
-    return false;
+  public hasComponent(componentType: Constructor<any>): boolean {
+    return this.components.has(componentType.name);
   }
 
-  public hasComponents(...types: Constructor<any>[]): boolean {
-    for (const type of types) {
-      if (!this.hasComponent(type)) {
-        return false;
-      }
-    }
-
-    return true;
+  public hasComponents(...componentTypes: Constructor<any>[]): boolean {
+    return componentTypes.every((componentType) =>
+      this.hasComponent(componentType),
+    );
   }
 }

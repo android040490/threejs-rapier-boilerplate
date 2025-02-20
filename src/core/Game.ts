@@ -1,18 +1,22 @@
-import * as THREE from "three";
 import Stats from "stats.js";
 import { WindowSizeManager } from "./managers/WindowSizeManager";
 import { TimeManager } from "./managers/TimeManager";
 import { CameraManager } from "./managers/CameraManager";
-import Renderer from "./managers/Renderer";
+import { Renderer } from "./managers/Renderer";
 import { ResourcesManager } from "./managers/ResourcesManager";
 import { DebugManager } from "./managers/DebugManager";
 import eventBus, { EventBus } from "./event/EventBus";
 import { SystemManager } from "./managers/SystemManager";
 import { TimeTick } from "./event/TimeTick";
+import { RenderSystem } from "./systems/RenderSystem";
+import { EntityManager } from "./managers/EntityManager";
 
 let instance: Game;
 
 export class Game {
+  private readonly eventBus!: EventBus;
+  private stats?: Stats;
+
   public readonly canvas!: HTMLCanvasElement;
   public readonly debugManager!: DebugManager;
   public readonly windowSizeManager!: WindowSizeManager;
@@ -20,18 +24,13 @@ export class Game {
   public readonly resourcesManager!: ResourcesManager;
   public readonly cameraManager!: CameraManager;
   public readonly renderer!: Renderer;
-  public readonly scene!: THREE.Scene;
-  private readonly eventBus!: EventBus;
-  private readonly systemManager!: SystemManager;
-
-  private stats?: Stats;
+  public readonly systemManager!: SystemManager;
+  public readonly entityManager!: EntityManager;
 
   constructor() {
     if (instance) {
       return instance;
     }
-
-    // window.experience = this;
 
     instance = this;
     // Options
@@ -41,12 +40,14 @@ export class Game {
     this.debugManager = new DebugManager();
     this.windowSizeManager = new WindowSizeManager();
     this.timeManager = new TimeManager();
-    this.scene = new THREE.Scene();
     this.resourcesManager = new ResourcesManager();
     this.cameraManager = new CameraManager(this);
     this.renderer = new Renderer(this);
     this.systemManager = new SystemManager();
+    this.entityManager = new EntityManager();
     this.eventBus = eventBus;
+
+    this.systemManager.addSystem(new RenderSystem(this));
 
     this.update = this.update.bind(this);
   }
@@ -63,20 +64,6 @@ export class Game {
   destroy(): void {
     this.eventBus.off(TimeTick, this.update);
 
-    this.scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.geometry.dispose();
-
-        for (const key in child.material) {
-          const value = child.material[key];
-
-          if (value && typeof value.dispose === "function") {
-            value.dispose();
-          }
-        }
-      }
-    });
-
     this.cameraManager.dispose();
     this.renderer.dispose();
 
@@ -91,7 +78,7 @@ export class Game {
     }
     this.cameraManager.update();
     this.systemManager.update();
-    this.renderer.update();
+
     if (this.debugManager.active) {
       this.stats?.end();
     }
