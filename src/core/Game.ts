@@ -11,6 +11,7 @@ import { TimeTick } from "./event/TimeTick";
 import { EntityManager } from "./managers/EntityManager";
 import { System } from "./models/System";
 import { Constructor } from "./type-utils/constructor";
+import { PhysicsManager } from "./managers/PhysicsManager";
 
 let instance: Game;
 
@@ -27,6 +28,7 @@ export class Game {
   public readonly renderer!: Renderer;
   public readonly systemManager!: SystemManager;
   public readonly entityManager!: EntityManager;
+  public readonly physicsManager!: PhysicsManager;
 
   constructor(canvas: HTMLCanvasElement) {
     if (instance) {
@@ -44,6 +46,7 @@ export class Game {
     this.renderer = new Renderer(this);
     this.systemManager = new SystemManager();
     this.entityManager = new EntityManager();
+    this.physicsManager = new PhysicsManager();
     this.eventBus = eventBus;
 
     this.update = this.update.bind(this);
