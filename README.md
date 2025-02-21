@@ -1,4 +1,6 @@
-# Zombie Land game
+# Three.js starter with Rapier as physics engine
+
+This is a boilerplate for starting a new Three.js project with Rapier as physics engine. It uses the ECS architecture approach
 
 ## Setup
 
