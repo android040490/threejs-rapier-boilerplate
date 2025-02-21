@@ -8,8 +8,9 @@ import { DebugManager } from "./managers/DebugManager";
 import eventBus, { EventBus } from "./event/EventBus";
 import { SystemManager } from "./managers/SystemManager";
 import { TimeTick } from "./event/TimeTick";
-import { RenderSystem } from "./systems/RenderSystem";
 import { EntityManager } from "./managers/EntityManager";
+import { System } from "./models/System";
+import { Constructor } from "./type-utils/constructor";
 
 let instance: Game;
 
@@ -27,16 +28,14 @@ export class Game {
   public readonly systemManager!: SystemManager;
   public readonly entityManager!: EntityManager;
 
-  constructor() {
+  constructor(canvas: HTMLCanvasElement) {
     if (instance) {
       return instance;
     }
 
     instance = this;
-    // Options
-    this.canvas = document.querySelector("canvas.webgl") as HTMLCanvasElement;
-
     // Setup
+    this.canvas = canvas;
     this.debugManager = new DebugManager();
     this.windowSizeManager = new WindowSizeManager();
     this.timeManager = new TimeManager();
@@ -46,8 +45,6 @@ export class Game {
     this.systemManager = new SystemManager();
     this.entityManager = new EntityManager();
     this.eventBus = eventBus;
-
-    this.systemManager.addSystem(new RenderSystem(this));
 
     this.update = this.update.bind(this);
   }
@@ -72,6 +69,10 @@ export class Game {
     }
   }
 
+  addSystem(SystemConstructor: Constructor<System>): void {
+    this.systemManager.addSystem(new SystemConstructor(this));
+  }
+
   private update(): void {
     if (this.debugManager.active) {
       this.stats?.begin();
@@ -90,5 +91,3 @@ export class Game {
     document.body.appendChild(this.stats.dom);
   }
 }
-
-export default new Game();

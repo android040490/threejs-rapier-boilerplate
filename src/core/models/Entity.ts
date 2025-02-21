@@ -1,6 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-
-export type Constructor<T = object> = new (...args: any[]) => T;
+import { Constructor } from "../type-utils/constructor";
 
 export class Entity {
   private readonly components = new Map<

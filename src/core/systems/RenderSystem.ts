@@ -3,14 +3,15 @@ import { Game } from "../Game";
 import { Entity } from "../models/Entity";
 import { Renderer } from "../managers/Renderer";
 import { RenderComponent } from "../components/RenderComponent";
+import { PositionComponent } from "../components/PositionComponent";
 
 export class RenderSystem extends System {
   private readonly renderer: Renderer;
 
   public constructor(game: Game) {
-    super();
+    super(game);
 
-    this.renderer = game.renderer;
+    this.renderer = this.game.renderer;
   }
 
   appliesTo(entity: Entity): boolean {
@@ -25,16 +26,21 @@ export class RenderSystem extends System {
     }
   }
 
+  addEntity(entity: Entity): void {
+    super.addEntity(entity);
+    const component = entity.getComponent(RenderComponent);
+    if (component?.object) {
+      this.renderer.scene.add(component.object);
+    }
+  }
+
   update(): void {
     for (const [_, entity] of this.entities) {
-      const component = entity.getComponent(RenderComponent);
-      if (component?.object?.parent === this.renderer.scene) {
-        // if the object is already on the scene then skip
-        continue;
-      }
+      const { position } = entity.getComponent(PositionComponent) ?? {};
+      const { object } = entity.getComponent(RenderComponent) ?? {};
 
-      if (component?.object) {
-        this.renderer.scene.add(component.object);
+      if (position && object) {
+        object.position.copy(position);
       }
     }
 
