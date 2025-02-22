@@ -4,6 +4,7 @@ import { Entity } from "../models/Entity";
 import { Renderer } from "../managers/Renderer";
 import { RenderComponent } from "../components/RenderComponent";
 import { PositionComponent } from "../components/PositionComponent";
+import { RotationComponent } from "../components/RotationComponent";
 
 export class RenderSystem extends System {
   private readonly renderer: Renderer;
@@ -37,10 +38,14 @@ export class RenderSystem extends System {
   update(): void {
     for (const [_, entity] of this.entities) {
       const { position } = entity.getComponent(PositionComponent) ?? {};
+      const { rotation } = entity.getComponent(RotationComponent) ?? {};
       const { object } = entity.getComponent(RenderComponent) ?? {};
 
-      if (position && object) {
-        object.position.copy(position);
+      if (position) {
+        object?.position.copy(position);
+      }
+      if (rotation) {
+        object?.rotation.setFromQuaternion(rotation);
       }
     }
 

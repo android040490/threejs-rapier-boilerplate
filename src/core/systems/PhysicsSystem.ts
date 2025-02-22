@@ -5,6 +5,7 @@ import { PositionComponent } from "../components/PositionComponent";
 import { PhysicsManager } from "../managers/PhysicsManager";
 import { PhysicsComponent } from "../components/PhysicsComponent";
 import { TimeManager } from "../managers/TimeManager";
+import { RotationComponent } from "../components/RotationComponent";
 
 export class PhysicsSystem extends System {
   private readonly physicsManager: PhysicsManager;
@@ -34,6 +35,7 @@ export class PhysicsSystem extends System {
     super.addEntity(entity);
     const component = entity.getComponent(PhysicsComponent);
     const { position } = entity.getComponent(PositionComponent) ?? {};
+    const { rotation } = entity.getComponent(RotationComponent) ?? {};
     if (component?.config) {
       const { collider, rigidBody } = this.physicsManager.createObject(
         component.config,
@@ -44,16 +46,24 @@ export class PhysicsSystem extends System {
     if (position) {
       component?.rigidBody?.setTranslation(position, true);
     }
+    if (rotation) {
+      component?.rigidBody?.setRotation(rotation, true);
+    }
   }
 
   update(): void {
     for (const [_, entity] of this.entities) {
+      const { rigidBody } = entity.getComponent(PhysicsComponent) ?? {};
       const { position } = entity.getComponent(PositionComponent) ?? {};
-      const { collider } = entity.getComponent(PhysicsComponent) ?? {};
+      const { rotation } = entity.getComponent(RotationComponent) ?? {};
 
-      if (position && collider) {
-        const newPosition = collider.translation();
+      if (position && rigidBody) {
+        const newPosition = rigidBody.translation();
         position.copy(newPosition);
+      }
+      if (rotation && rigidBody) {
+        const newRotation = rigidBody.rotation();
+        rotation.copy(newRotation);
       }
     }
 

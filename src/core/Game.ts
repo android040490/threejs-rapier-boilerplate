@@ -12,6 +12,7 @@ import { EntityManager } from "./managers/EntityManager";
 import { System } from "./models/System";
 import { Constructor } from "./type-utils/constructor";
 import { PhysicsManager } from "./managers/PhysicsManager";
+import { systems } from "./systems";
 
 let instance: Game;
 
@@ -50,6 +51,8 @@ export class Game {
     this.eventBus = eventBus;
 
     this.update = this.update.bind(this);
+
+    this.setSystems();
   }
 
   start(): void {
@@ -72,10 +75,6 @@ export class Game {
     }
   }
 
-  addSystem(SystemConstructor: Constructor<System>): void {
-    this.systemManager.addSystem(new SystemConstructor(this));
-  }
-
   private update(): void {
     if (this.debugManager.active) {
       this.stats?.begin();
@@ -92,5 +91,15 @@ export class Game {
     this.stats = new Stats();
     this.stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
     document.body.appendChild(this.stats.dom);
+  }
+
+  private setSystems(): void {
+    systems.forEach((SystemConstructor) => {
+      this.addSystem(SystemConstructor);
+    });
+  }
+
+  private addSystem(SystemConstructor: Constructor<System>): void {
+    this.systemManager.addSystem(new SystemConstructor(this));
   }
 }
