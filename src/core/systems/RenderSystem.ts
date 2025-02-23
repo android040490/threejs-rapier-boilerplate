@@ -9,7 +9,7 @@ import { RotationComponent } from "../components/RotationComponent";
 export class RenderSystem extends System {
   private readonly renderer: Renderer;
 
-  public constructor(game: Game) {
+  constructor(game: Game) {
     super(game);
 
     this.renderer = this.game.renderer;
@@ -20,7 +20,7 @@ export class RenderSystem extends System {
   }
 
   removeEntity(entity: Entity): void {
-    this.entities.delete(entity.id);
+    super.removeEntity(entity);
     const component = entity.getComponent(RenderComponent);
     if (component?.object) {
       this.renderer.scene.remove(component.object);

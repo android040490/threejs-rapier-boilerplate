@@ -128,10 +128,10 @@ export class PhysicsManager {
         break;
     }
 
-    if (density) {
+    if (density !== undefined) {
       colliderDesc.setDensity(density);
     }
-    if (restitution) {
+    if (restitution !== undefined) {
       colliderDesc.setRestitution(restitution);
     }
 

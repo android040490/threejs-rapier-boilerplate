@@ -1,3 +1,4 @@
+import { EntityUpdated } from "../event/EntityUpdated";
 import { EntityAdded } from "../event/EntityAdded";
 import { EntityRemoved } from "../event/EntityRemoved";
 import eventBus, { EventBus } from "../event/EventBus";
@@ -18,7 +19,11 @@ export class EntityManager {
 
   removeEntity(entity: Entity): void {
     this.entities.delete(entity.id);
-
     this.eventBus.emit(new EntityRemoved(entity));
+  }
+
+  addComponent<T extends object>(entity: Entity, component: T): void {
+    entity.addComponent(component);
+    this.eventBus.emit(new EntityUpdated(entity));
   }
 }
