@@ -12,6 +12,11 @@ export class ResourcesManager {
   private readonly loadingManager: THREE.LoadingManager;
   private readonly loaders: Loaders;
   private readonly eventBus: EventBus = eventBus;
+  private readonly textureCache: Map<string, THREE.Texture> = new Map();
+  private readonly loadingTextures: Map<
+    string,
+    Promise<THREE.Texture | undefined>
+  > = new Map();
 
   constructor() {
     this.loadingManager = new THREE.LoadingManager();
@@ -23,21 +28,39 @@ export class ResourcesManager {
     this.listenLoadingEvents();
   }
 
-  loadTexture(path: string): Promise<THREE.Texture | undefined> {
-    return new Promise((resolve) => {
-      // TODO: consider caching if necessary
+  loadTexture(
+    path: string,
+    useCache: boolean = true,
+  ): Promise<THREE.Texture | undefined> {
+    if (this.textureCache.has(path)) {
+      const texture = this.textureCache.get(path);
+      return Promise.resolve(useCache ? texture : texture?.clone());
+    }
+
+    if (this.loadingTextures.has(path)) {
+      return this.loadingTextures.get(path)!;
+    }
+
+    const texturePromise = new Promise<THREE.Texture | undefined>((resolve) => {
       this.loaders.texture.load(
         path,
-        (file) => {
-          resolve(file);
+        (texture) => {
+          this.textureCache.set(path, texture);
+          this.loadingTextures.delete(path);
+
+          resolve(useCache ? texture : texture.clone());
         },
         (_: ProgressEvent) => {},
-        (error: any) => {
+        (error) => {
           console.error("Load texture error:", error);
+          this.loadingTextures.delete(path);
           resolve(undefined);
         },
       );
     });
+
+    this.loadingTextures.set(path, texturePromise);
+    return texturePromise;
   }
 
   loadTextures(paths: string[]): Promise<Array<THREE.Texture | undefined>> {

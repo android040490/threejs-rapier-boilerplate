@@ -11,7 +11,7 @@ export class PhysicsSystem extends System {
   private readonly physicsManager: PhysicsManager;
   private readonly timeManager: TimeManager;
 
-  public constructor(game: Game) {
+  constructor(game: Game) {
     super(game);
 
     this.physicsManager = this.game.physicsManager;
@@ -23,7 +23,7 @@ export class PhysicsSystem extends System {
   }
 
   removeEntity(entity: Entity): void {
-    this.entities.delete(entity.id);
+    super.removeEntity(entity);
     const { rigidBody } = entity.getComponent(PhysicsComponent) ?? {};
 
     if (rigidBody) {
