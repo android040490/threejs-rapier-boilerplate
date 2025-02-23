@@ -42,27 +42,42 @@ export class MeshBuilderSystem extends System {
   }
 
   private async createMesh(entity: Entity, config: MeshConfig): Promise<void> {
-    const { texturePaths } = entity.getComponent(TextureComponent) ?? {};
+    const textureComponent = entity.getComponent(TextureComponent);
 
-    if (texturePaths) {
-      let textureMap: TextureMap = {};
-      const textures = Object.entries(texturePaths).map(async ([key, path]) => {
-        const texture = await this.resourcesManager.loadTexture(path);
-        if (texture) {
-          textureMap[key as TextureKey] = texture;
-        }
-      });
-      await Promise.all(textures);
-
-      config.material.params = [
-        {
-          ...config.material.params[0],
-          ...textureMap,
-        },
-      ];
+    if (textureComponent) {
+      await this.setTexture(config, textureComponent);
     }
     const mesh = this.meshBuilder.createMesh(config);
 
     this.entityManager.addComponent(entity, new RenderComponent(mesh));
+  }
+
+  private async setTexture(
+    config: MeshConfig,
+    textureComponent: TextureComponent,
+  ): Promise<void> {
+    const { texturePaths, useCache, colorSpace, wrapS, wrapT, repeat } =
+      textureComponent;
+
+    let textureMap: TextureMap = {};
+    const textures = Object.entries(texturePaths).map(async ([key, path]) => {
+      const texture = await this.resourcesManager.loadTexture(path, useCache);
+      if (!texture) {
+        return;
+      }
+      if (key === "map") {
+        texture.colorSpace = colorSpace;
+      }
+      texture.repeat = repeat;
+      texture.wrapS = wrapS;
+      texture.wrapT = wrapT;
+      textureMap[key as TextureKey] = texture;
+    });
+    await Promise.all(textures);
+
+    config.material.params = {
+      ...config.material.params,
+      ...textureMap,
+    };
   }
 }

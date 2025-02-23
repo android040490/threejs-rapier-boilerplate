@@ -24,15 +24,15 @@ type GeometryConfig =
 // Material Config Types
 interface StandardMaterialConfig {
   type: "standard";
-  params: ConstructorParameters<typeof THREE.MeshStandardMaterial>;
+  params: ConstructorParameters<typeof THREE.MeshStandardMaterial>[0];
 }
 interface PhongMaterialConfig {
   type: "phong";
-  params: ConstructorParameters<typeof THREE.MeshPhongMaterial>;
+  params: ConstructorParameters<typeof THREE.MeshPhongMaterial>[0];
 }
 interface BasicMaterialConfig {
   type: "basic";
-  params: ConstructorParameters<typeof THREE.MeshBasicMaterial>;
+  params: ConstructorParameters<typeof THREE.MeshBasicMaterial>[0];
 }
 
 type MaterialConfig =
@@ -50,6 +50,12 @@ export type TextureKey =
 export type TexturePaths = {
   [key in TextureKey]?: string;
 };
+
+export interface TextureConfig {
+  texturePaths: TexturePaths;
+  useCache?: boolean;
+  colorSpace?: string;
+}
 
 export type TextureMap = {
   [key in TextureKey]?: THREE.Texture;
@@ -86,13 +92,13 @@ export class MeshBuilder {
   private createMaterial(materialConfig: MaterialConfig): THREE.Material {
     switch (materialConfig.type) {
       case "standard":
-        return new THREE.MeshStandardMaterial(...materialConfig.params);
+        return new THREE.MeshStandardMaterial(materialConfig.params);
 
       case "phong":
-        return new THREE.MeshPhongMaterial(...materialConfig.params);
+        return new THREE.MeshPhongMaterial(materialConfig.params);
 
       case "basic":
-        return new THREE.MeshBasicMaterial(...materialConfig.params);
+        return new THREE.MeshBasicMaterial(materialConfig.params);
     }
   }
 }
