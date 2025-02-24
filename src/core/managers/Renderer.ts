@@ -41,6 +41,7 @@ export class Renderer {
   }
 
   update(): void {
+    // console.log(this.instance.info.memory.textures); // for debuging textures
     this.instance.render(this.scene, this.cameraManager.camera);
   }
 

@@ -1,3 +1,4 @@
+import * as THREE from "three";
 import { System } from "../models/System";
 import { Game } from "../Game";
 import { Entity } from "../models/Entity";
@@ -21,9 +22,24 @@ export class RenderSystem extends System {
 
   removeEntity(entity: Entity): void {
     super.removeEntity(entity);
-    const component = entity.getComponent(RenderComponent);
-    if (component?.object) {
-      this.renderer.scene.remove(component.object);
+    const { object } = entity.getComponent(RenderComponent) ?? {};
+    if (object) {
+      this.renderer.scene.remove(object);
+
+      if (object instanceof THREE.Mesh) {
+        object.geometry.dispose();
+        object.material.dispose();
+
+        // TODO: probably add cleanup textures
+        // something like this
+        // for (const key in object?.material ?? {}) {
+        //   const value = object?.material[key];
+
+        //   if (value && typeof value.dispose === "function") {
+        //     value.dispose();
+        //   }
+        // }
+      }
     }
   }
 

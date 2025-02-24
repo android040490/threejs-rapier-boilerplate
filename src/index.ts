@@ -6,6 +6,7 @@ import { PhysicsComponent } from "./core/components/PhysicsComponent";
 import { RotationComponent } from "./core/components/RotationComponent";
 import { MeshConfigComponent } from "./core/components/MeshConfigComponent";
 import { TextureComponent } from "./core/components/TextureComponent";
+import { EnvironmentComponent } from "./core/components/EnvironmentComponent";
 
 const game = new Game(
   document.querySelector("canvas.webgl") as HTMLCanvasElement,
@@ -13,15 +14,19 @@ const game = new Game(
 
 game.start();
 
-const floorEntity = new Entity();
+// Environment
+const environmentEntity = new Entity();
+environmentEntity.addComponent(new EnvironmentComponent());
+game.entityManager.addEntity(environmentEntity);
 
+// Floor
+const floorEntity = new Entity();
 floorEntity.addComponent(
   new MeshConfigComponent({
     geometry: { type: "cylinder", params: [50, 50, 0.5] },
-    material: { type: "basic", params: { color: "#00f" } },
+    material: { type: "standard", params: { color: "#5b4" } },
   }),
 );
-
 floorEntity.addComponent(new PositionComponent(new THREE.Vector3(0, 0, 0)));
 floorEntity.addComponent(
   new PhysicsComponent({
@@ -29,7 +34,6 @@ floorEntity.addComponent(
     rigidBodyType: "fixed",
   }),
 );
-
 game.entityManager.addEntity(floorEntity);
 
 const createExample = () => {
