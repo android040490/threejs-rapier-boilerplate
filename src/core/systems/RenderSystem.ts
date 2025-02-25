@@ -23,23 +23,43 @@ export class RenderSystem extends System {
   removeEntity(entity: Entity): void {
     super.removeEntity(entity);
     const { object } = entity.getComponent(RenderComponent) ?? {};
+
     if (object) {
-      this.renderer.scene.remove(object);
+      object.traverse((child) => {
+        if (child instanceof THREE.Mesh) {
+          child.geometry.dispose();
 
-      if (object instanceof THREE.Mesh) {
-        object.geometry.dispose();
-        object.material.dispose();
+          if (Array.isArray(child.material)) {
+            child.material.forEach((mat) => mat.dispose());
+          } else {
+            child.material.dispose();
+          }
 
-        // TODO: probably add cleanup textures
-        // something like this
-        // for (const key in object?.material ?? {}) {
-        //   const value = object?.material[key];
+          // Cleanup textures
+          const material = child.material as THREE.Material;
+          Object.keys(material).forEach((key) => {
+            const materialElem = (material as any)[key];
+            if (materialElem && typeof materialElem.dispose === "function") {
+              materialElem.dispose();
+            }
+            // or use the approach below
+            // if (materialElem instanceof THREE.Texture) {
+            //   materialElem.dispose();
+            // }
+          });
+        }
 
-        //   if (value && typeof value.dispose === "function") {
-        //     value.dispose();
-        //   }
-        // }
-      }
+        // Cleanup SkinnedMesh
+        if (child instanceof THREE.SkinnedMesh) {
+          // child.skeleton.boneTexture?.dispose();
+          // child.skeleton.boneTexture = null;
+          child.skeleton.dispose();
+        }
+      });
+
+      // Remove object from the scene
+      object.removeFromParent();
+      // object.parent?.remove(object);
     }
   }
 

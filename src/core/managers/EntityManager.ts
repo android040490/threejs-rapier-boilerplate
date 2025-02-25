@@ -26,4 +26,11 @@ export class EntityManager {
     entity.addComponent(component);
     this.eventBus.emit(new EntityUpdated(entity));
   }
+
+  addComponents<T extends object>(entity: Entity, components: T[]): void {
+    components.forEach((component) => {
+      entity.addComponent(component);
+    });
+    this.eventBus.emit(new EntityUpdated(entity));
+  }
 }

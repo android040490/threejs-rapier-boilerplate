@@ -52,7 +52,7 @@ export class CameraManager {
       1000,
     );
 
-    this._camera.position.set(0, 3, 10);
+    this._camera.position.set(0, 2, 15);
     this._camera.lookAt(0, 0, 0);
   }
 
