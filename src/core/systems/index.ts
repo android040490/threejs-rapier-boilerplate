@@ -4,10 +4,12 @@ import { RenderSystem } from "./RenderSystem";
 import { PhysicsSystem } from "./PhysicsSystem";
 import { MeshBuilderSystem } from "./MeshBuilderSystem";
 import { EnvironmentSystem } from "./EnvironmentSystem";
+import { ModelSystem } from "./ModelSystem";
 
 // The order of the systems is important because it will affect the rendering result and the behavior of the application.
 export const systems: Constructor<System>[] = [
   EnvironmentSystem,
+  ModelSystem,
   MeshBuilderSystem,
   PhysicsSystem,
   RenderSystem,

@@ -24,7 +24,7 @@ export class EnvironmentComponent {
     const {
       sunLightColor = "#ffffff",
       sunLightIntensity = 4,
-      sunPhi = Math.PI / 2,
+      sunPhi = Math.PI / 3,
       sunTheta = Math.PI / 4,
       ambientLightColor = "#ffffff",
       ambientLightIntensity = 0.05,
