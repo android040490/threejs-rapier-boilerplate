@@ -8,6 +8,7 @@ import { ResourcesManager } from "../managers/ResourcesManager";
 import { ModelComponent } from "../components/ModelComponent";
 import { PhysicsComponent } from "../components/PhysicsComponent";
 import { SkeletonUtils } from "three/examples/jsm/Addons.js";
+import { AnimationComponent } from "../components/AnimationComponent";
 
 export class ModelSystem extends System {
   private readonly entityManager: EntityManager;
@@ -54,7 +55,7 @@ export class ModelSystem extends System {
       modelMesh.position.y = -size.y / 2;
       mesh.add(modelMesh);
 
-      this.entityManager.addComponents(entity, [
+      const components: object[] = [
         new RenderComponent(mesh),
         new PhysicsComponent({
           shape: { type: "box", sizes: size },
@@ -62,7 +63,13 @@ export class ModelSystem extends System {
           rigidBodyType: "dynamic",
           restitution: 0.9,
         }),
-      ]);
+      ];
+
+      if (model.animations.length > 0) {
+        components.push(new AnimationComponent(modelMesh, model.animations));
+      }
+
+      this.entityManager.addComponents(entity, components);
     }
   }
 }
