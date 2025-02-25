@@ -7,6 +7,7 @@ import { RotationComponent } from "./core/components/RotationComponent";
 import { MeshConfigComponent } from "./core/components/MeshConfigComponent";
 import { TextureComponent } from "./core/components/TextureComponent";
 import { EnvironmentComponent } from "./core/components/EnvironmentComponent";
+import { ModelComponent } from "./core/components/ModelComponent";
 
 const game = new Game(
   document.querySelector("canvas.webgl") as HTMLCanvasElement,
@@ -15,28 +16,42 @@ const game = new Game(
 game.start();
 
 // Environment
-const environmentEntity = new Entity();
-environmentEntity.addComponent(new EnvironmentComponent());
-game.entityManager.addEntity(environmentEntity);
+const createEnvironment = () => {
+  const environmentEntity = new Entity();
+  environmentEntity.addComponent(new EnvironmentComponent());
+  game.entityManager.addEntity(environmentEntity);
+};
 
-// Floor
-const floorEntity = new Entity();
-floorEntity.addComponent(
-  new MeshConfigComponent({
-    geometry: { type: "cylinder", params: [50, 50, 0.5] },
-    material: { type: "standard", params: { color: "#5b4" } },
-  }),
-);
-floorEntity.addComponent(new PositionComponent(new THREE.Vector3(0, 0, 0)));
-floorEntity.addComponent(
-  new PhysicsComponent({
-    shape: { type: "cylinder", radius: 50, height: 0.5 },
-    rigidBodyType: "fixed",
-  }),
-);
-game.entityManager.addEntity(floorEntity);
+// Floor Entity
+const createFloor = () => {
+  const floorEntity = new Entity();
+  floorEntity.addComponent(
+    new MeshConfigComponent({
+      geometry: { type: "cylinder", params: [50, 50, 0.5] },
+      material: { type: "standard", params: { color: "#5b4" } },
+    }),
+  );
+  floorEntity.addComponent(new PositionComponent(new THREE.Vector3(0, 0, 0)));
+  floorEntity.addComponent(
+    new PhysicsComponent({
+      shape: { type: "cylinder", radius: 50, height: 0.5 },
+      rigidBodyType: "fixed",
+    }),
+  );
+  game.entityManager.addEntity(floorEntity);
+};
 
-const createExample = () => {
+// 3D Model Entity
+const create3DModel = () => {
+  const model = new Entity();
+  model.addComponent(new ModelComponent("models/model-2.glb"));
+  model.addComponent(new PositionComponent(new THREE.Vector3(0, 6, 0)));
+  model.addComponent(new RotationComponent(0, 0, 0, 1));
+  game.entityManager.addEntity(model);
+};
+
+// Mesh Entity
+const createMesh = () => {
   const exampleEntity = new Entity();
   exampleEntity.addComponent(
     new MeshConfigComponent({
@@ -64,10 +79,9 @@ const createExample = () => {
   );
 
   game.entityManager.addEntity(exampleEntity);
-
-  setTimeout(() => {
-    createExample();
-  }, 1000);
 };
 
-createExample();
+createEnvironment();
+createFloor();
+createMesh();
+create3DModel();

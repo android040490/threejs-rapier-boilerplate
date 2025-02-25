@@ -45,9 +45,9 @@ export class ModelSystem extends System {
 
       const geometry = new THREE.BoxGeometry(size.x, size.y, size.z);
       const material = new THREE.MeshBasicMaterial({
-        color: 0x00ff00,
-        wireframe: true,
-        // visible: false,
+        // color: 0x00ff00,
+        // wireframe: true,
+        visible: false,
       });
       const mesh = new THREE.Mesh(geometry, material);
 
