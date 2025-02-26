@@ -44,8 +44,8 @@ const createFloor = () => {
 // 3D Model Entity
 const create3DModel = () => {
   const model = new Entity();
-  model.addComponent(new ModelComponent("models/model-2.glb"));
-  model.addComponent(new PositionComponent(new THREE.Vector3(0, 6, 0)));
+  model.addComponent(new ModelComponent("models/animated-avatar.glb"));
+  model.addComponent(new PositionComponent(new THREE.Vector3(0, 1, 0)));
   model.addComponent(new RotationComponent(0, 0, 0, 1));
   game.entityManager.addEntity(model);
 };
